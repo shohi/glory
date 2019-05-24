@@ -16,7 +16,7 @@ var conf = config.Config{}
 
 var rootCmd = &cobra.Command{
 	Use:   "fsplit",
-	Short: "fsplit splits file into two equal parts",
+	Short: "fsplit splits file into equal parts",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			log.Println("arguments must not be empty")
