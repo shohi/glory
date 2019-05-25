@@ -2,17 +2,24 @@ package util
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"math"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 const (
-	SplitSeparator    = ".part@"
-	MaxRW             = 1 << 30
+	// SplitSeparator is used to generate chunk files
+	SplitSeparator = ".part@"
+
+	// MaxRW is max size one read/write can handle
+	MaxRW = 1 << 30
+
+	// DefaultBufferSize is default read/write buffer size
 	DefaultBufferSize = 1024 * 1024 * 8 // 8M bytes
 )
 
@@ -101,7 +108,7 @@ func AppendFile(dst *os.File, src *os.File, limit int64) error {
 	// NOTE: reuse buffer
 	buf := make([]byte, bufSize)
 
-	var left int64 = limit
+	var left = limit
 	for left > 0 {
 		if left < int64(bufSize) {
 			buf = make([]byte, left)
@@ -123,4 +130,31 @@ func AppendFile(dst *os.File, src *os.File, limit int64) error {
 	}
 
 	return nil
+}
+
+// FindFiles gets file list matched given pattern in absoluate path
+func FindFiles(dir string, pattern string) ([]string, error) {
+	re, err := regexp.Compile(".*" + pattern + ".*")
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO
+	// use filepath.Walk methods to handle
+	// lots of files in the directory
+
+	var result []string
+	files, err := ioutil.ReadDir(dir)
+	for _, f := range files {
+		if f.IsDir() {
+			continue
+		}
+
+		name := f.Name()
+		if re.MatchString(name) {
+			result = append(result, filepath.Join(dir, name))
+		}
+	}
+
+	return result, nil
 }
