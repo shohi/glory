@@ -3,21 +3,17 @@ package ping
 import (
 	"log"
 	"testing"
-
-	pping "github.com/sparrc/go-ping"
 )
 
-func TestPing(t *testing.T) {
-	// pinger, err := pping.NewPinger("www.douban.com")
+func TestPing_Reachable(t *testing.T) {
+	// err := GetLatency("douban.com")
+	lc, err := GetLatency("154.8.131.172")
+	log.Printf("latency: %v, err: %v", lc, err)
+}
 
-	// use ip address
-	pinger, err := pping.NewPinger("154.8.131.172")
-	if err != nil {
-		panic(err)
-	}
-	pinger.Count = 3
-	pinger.Run()                 // blocks until finished
-	stats := pinger.Statistics() // get send/receive/rtt stats
+func TestPing_Unreachable(t *testing.T) {
+	// err := GetLatency("fackebook.com")
+	lc, err := GetLatency("31.13.69.129")
 
-	log.Printf("stat: %#v", stats)
+	log.Printf("latency: %v, err: %v", lc, err)
 }
