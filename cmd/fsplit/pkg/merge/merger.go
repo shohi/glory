@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
+
+	"github.com/schollz/progressbar/v2"
 
 	"github.com/shohi/glory/cmd/fsplit/pkg/actor"
 	"github.com/shohi/glory/cmd/fsplit/pkg/config"
@@ -12,7 +15,8 @@ import (
 )
 
 // TODO
-// use pkg/err to wrap errors
+// 1. use pkg/err to wrap errors
+// 2. progress bar
 
 type merger struct {
 	conf  config.Config
@@ -78,6 +82,18 @@ func (m *merger) resetFilesByPattern() error {
 }
 
 func (m *merger) merge(file *os.File) error {
+	writer := os.Stdout
+
+	writer.WriteString(util.FormatTime(time.Now()))
+	writer.WriteString(" merging start...\n\n")
+
+	basename := filepath.Base(file.Name())
+
+	bar := progressbar.NewOptions(len(m.files),
+		progressbar.OptionSetWriter(writer),
+		progressbar.OptionSetDescription(basename),
+	)
+
 	for _, fp := range m.files {
 		f, err := os.Open(fp)
 		if err != nil {
@@ -92,7 +108,12 @@ func (m *merger) merge(file *os.File) error {
 		if err != nil {
 			return err
 		}
+		bar.Add(1)
 	}
 
+	// Add a newline when done
+	writer.WriteString("\n\n")
+	writer.WriteString(util.FormatTime(time.Now()))
+	writer.WriteString(" merging done.\n")
 	return nil
 }

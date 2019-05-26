@@ -92,7 +92,7 @@ func SplitFile(filename string, chunkNum int) error {
 		//	partBuffer := make([]byte, chunkSize)
 		// write/save buffer to disk
 		// err = ioutil.WriteFile(fileName, partBuffer[:n], os.ModeAppend)
-		log.Println("Split to : ", fileName)
+		log.Println("split to : ", fileName)
 	}
 
 	return nil
