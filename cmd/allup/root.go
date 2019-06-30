@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/shohi/glory/cmd/allup/pkg/config"
+	"github.com/shohi/glory/cmd/allup/pkg/up"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Use:   "allup",
 	Short: "update all repos under given folder",
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO
+		_ = up.UpdateAll(conf.Dir)
 	},
 }
 

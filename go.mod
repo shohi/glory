@@ -11,4 +11,5 @@ require (
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
+	gopkg.in/src-d/go-git.v4 v4.12.0
 )
