@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -15,7 +17,7 @@ const (
 var (
 	client = http.Client{}
 
-	ipAPIFormat       = "http://site.ip138.com/domain/read.do?domain=%s&time=%v"
+	ipAPIFormat       = "https://site.ip138.com/domain/read.do?domain=%s&time=%v"
 	locationAPIForamt = "http://api.ip138.com/query/?ip=%s&oid=5&mid=5&datatype=jsonp&sign=%s"
 )
 
@@ -54,7 +56,13 @@ type Location struct {
 }
 
 func getJSON(url string, v interface{}) error {
-	resp, err := client.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("User-Agent", "curl/7.64.1")
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -75,6 +83,7 @@ func GetIPs(domain string) (*IPInfo, error) {
 	var info IPInfo
 	err := getJSON(url, &info)
 	if err != nil {
+		log.Debugf("ip url: %v", url)
 		return nil, err
 	}
 
