@@ -17,18 +17,57 @@ func (l Latency) Less(other Latency) bool {
 	return l.Duration < other.Duration
 }
 
-// TODO: add configuration for ping, e.g. timeout/count
+const (
+	defaultCount   = 3
+	defaultTimeout = 2 * time.Second
+)
 
-// Latency returns the avg ping latency for the addr
+// Options for ping
+type Options struct {
+	Count   int
+	Timeout time.Duration
+}
+
+// DefaultOptions returns default configuration options for ping.
+func DefaultOptions() Options {
+	return Options{
+		Count:   defaultCount,
+		Timeout: defaultTimeout,
+	}
+}
+
+// Option is a function on the options for a ping.
+type Option func(opts *Options)
+
+// Count is an option to set ping count.
+func Count(count int) Option {
+	return func(opts *Options) {
+		opts.Count = count
+	}
+}
+
+// Timeout is an option to set total timeout for ping.
+func Timeout(d time.Duration) Option {
+	return func(opts *Options) {
+		opts.Timeout = d
+	}
+}
+
+// GetLatency returns the avg ping latency for the addr
 // addr can be ip string or domain name
-func GetLatency(addr string) (Latency, error) {
+func GetLatency(addr string, options ...Option) (Latency, error) {
 	pinger, err := pping.NewPinger(addr)
 	if err != nil {
 		return Latency{}, err
 	}
 
-	pinger.Count = 3
-	pinger.Timeout = 2 * time.Second
+	opts := DefaultOptions()
+	for _, opt := range options {
+		opt(&opts)
+	}
+
+	pinger.Count = opts.Count
+	pinger.Timeout = opts.Timeout
 	pinger.Run()                 // blocks until finished
 	stats := pinger.Statistics() // get send/receive/rtt stats
 

@@ -40,8 +40,11 @@ func setupFlags(cmd *cobra.Command) {
 	flagSet := cmd.Flags()
 
 	// Server configuration
-	flagSet.BoolVarP(&conf.ShowLocation, "location", "l", false, "whether to show ip location")
+	flagSet.BoolVar(&conf.ShowLocation, "location", false, "show ip location")
+	flagSet.BoolVarP(&conf.ShowLatency, "latency", "l", false, "show average latency")
 	flagSet.StringVar(&conf.LogLevel, "loglevel", "INFO", "log level")
+
+	flagSet.IntVar(&conf.PingCount, "pingcount", 3, "ping count")
 }
 
 // Execute is the entrance.

@@ -79,11 +79,11 @@ func getJSON(url string, v interface{}) error {
 func GetIPs(domain string) (*IPInfo, error) {
 	tsInMillis := time.Now().UnixNano() / 1e6
 	url := fmt.Sprintf(ipAPIFormat, domain, tsInMillis)
+	log.Debugf("ip url: %v", url)
 
 	var info IPInfo
 	err := getJSON(url, &info)
 	if err != nil {
-		log.Debugf("ip url: %v", url)
 		return nil, err
 	}
 

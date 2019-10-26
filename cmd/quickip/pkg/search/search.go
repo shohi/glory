@@ -58,7 +58,10 @@ func (s *search) do() {
 		// NOTE: use executor pool?
 		go func(index int, dp DomainIP) {
 			defer wg.Done()
-			qps, err := quickIP(v.Domain, s.conf.ShowLocation)
+			qps, err := quickIP(v.Domain, quickIPConfig{
+				location:  s.conf.ShowLocation,
+				pingCount: s.conf.PingCount,
+			})
 			resultCh <- result{
 				index: index,
 				value: qps,
@@ -116,6 +119,12 @@ func (s *search) dump() {
 				b.WriteString(p.Addr)
 				b.WriteString(" ")
 				b.WriteString(fmt.Sprintf("%v", p.Duration))
+			} else if s.conf.ShowLatency {
+				b.WriteString("  # ")
+				b.WriteString(fmt.Sprintf("%v", p.Duration))
+				b.WriteString(" ")
+				// use `%%%%` to print a percent sign
+				b.WriteString(fmt.Sprintf("%v%%%%", p.Loss))
 			}
 
 			b.WriteString("\n")

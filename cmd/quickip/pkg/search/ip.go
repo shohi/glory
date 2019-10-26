@@ -32,7 +32,13 @@ func (q QuickIPs) Swap(i, j int) {
 	q[i], q[j] = q[j], q[i]
 }
 
-func quickIP(domain string, location bool) (QuickIPs, error) {
+// TODO: refactor
+type quickIPConfig struct {
+	location  bool
+	pingCount int
+}
+
+func quickIP(domain string, conf quickIPConfig) (QuickIPs, error) {
 	info, err := resolve.GetIPs(domain)
 	if err != nil {
 		log.Debugf("%v - err: %v", domain, err)
@@ -60,11 +66,11 @@ func quickIP(domain string, location bool) (QuickIPs, error) {
 	for _, v := range info.Data {
 		go func(s resolve.IPSign) {
 			defer wg.Done()
-			lat, err := ping.GetLatency(s.IP)
+			lat, err := ping.GetLatency(s.IP, ping.Count(conf.pingCount))
 			log.Debugf("ip: %v, latency: %v, err: %v", s.IP, lat, err)
 
 			var addr string
-			if location {
+			if conf.location {
 				addr = resolve.GetLocation(s)
 				log.Debugf("ip: %v, location: %v", s.IP, addr)
 			}
