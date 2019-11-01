@@ -14,8 +14,9 @@ import (
 )
 
 type Config struct {
-	URL  string
-	Send bool
+	URL   string
+	Send  bool
+	Quiet bool
 }
 
 var conf Config
@@ -34,6 +35,7 @@ func setupFlags(cmd *cobra.Command) {
 	// Server configuration
 	flagSet.BoolVarP(&conf.Send, "send", "s", true, "send redis commands to url")
 	flagSet.StringVarP(&conf.URL, "url", "u", "", "redis compatible http server address")
+	flagSet.BoolVarP(&conf.Quiet, "quiet", "q", true, "quiet mode which will suppress all outputs")
 }
 
 // Execute is the entrance.
@@ -45,7 +47,7 @@ func Execute() {
 	}
 }
 
-func send(url string, args []string) error {
+func send(conf Config, args []string) error {
 	if len(args) == 0 {
 		return errors.New("No command")
 	}
@@ -59,7 +61,7 @@ func send(url string, args []string) error {
 	}
 
 	data := serde.SerializeRawRESP(cName, cArgs)
-	req, err := http.NewRequest("POST", url, bytes.NewReader(data))
+	req, err := http.NewRequest("POST", conf.URL, bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
@@ -68,12 +70,14 @@ func send(url string, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp.StatusCode)
+	if !conf.Quiet {
+		fmt.Println(resp.StatusCode)
+	}
 
 	return httputil.DiscardBodyAndClose(resp)
 }
 
-func get(url string) error {
+func get(conf Config) error {
 	// TODO
 	log.Printf("TODO")
 	return nil
@@ -81,8 +85,8 @@ func get(url string) error {
 
 func run(cmd *cobra.Command, args []string) error {
 	if conf.Send {
-		return send(conf.URL, args)
+		return send(conf, args)
 	}
 
-	return get(conf.URL)
+	return get(conf)
 }
