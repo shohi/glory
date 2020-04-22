@@ -58,7 +58,7 @@ func (s *search) do() {
 		// NOTE: use executor pool?
 		go func(index int, dp DomainIP) {
 			defer wg.Done()
-			qps, err := quickIP(v.Domain, quickIPConfig{
+			qps, err := quickIP(dp.Domain, quickIPConfig{
 				location:  s.conf.ShowLocation,
 				pingCount: s.conf.PingCount,
 			})
