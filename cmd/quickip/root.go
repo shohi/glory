@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -13,11 +14,18 @@ import (
 )
 
 var conf = config.Config{}
+var showVersion bool
+var gitCommit = "not set"
 
 var rootCmd = &cobra.Command{
 	Use:   "quickip",
 	Short: "quickip finds ip for given domain with least latency",
 	Run: func(cmd *cobra.Command, args []string) {
+		if showVersion {
+			fmt.Printf("version: %v\n", gitCommit)
+			os.Exit(0)
+		}
+
 		initLog(conf.LogLevel)
 
 		if len(args) == 0 {
@@ -45,6 +53,8 @@ func setupFlags(cmd *cobra.Command) {
 	flagSet.StringVar(&conf.LogLevel, "loglevel", "INFO", "log level")
 
 	flagSet.IntVar(&conf.PingCount, "pingcount", 3, "ping count")
+
+	flagSet.BoolVarP(&showVersion, "version", "v", false, "show version")
 }
 
 // Execute is the entrance.
