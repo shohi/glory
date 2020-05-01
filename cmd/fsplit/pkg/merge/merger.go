@@ -12,7 +12,10 @@ import (
 	"github.com/shohi/glory/cmd/fsplit/pkg/actor"
 	"github.com/shohi/glory/cmd/fsplit/pkg/config"
 	"github.com/shohi/glory/cmd/fsplit/pkg/util"
+	"github.com/shohi/glory/pkg/fsutil"
 )
+
+type Files = fsutil.Files
 
 // TODO
 // 1. use pkg/err to wrap errors
